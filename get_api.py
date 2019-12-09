@@ -44,22 +44,13 @@ print(response.json())
 def update_contact_duplicate(id,telegram_id,parentRef,ref):
   data = {
   'apikey': '0635d163f4c298d4383e50e8902d0f5a',
-  'params': 
+  'params':
+    {'id': id,'fields':
     {
-      'id': id,
-      'fields':
-      {
-        'id': '1560',
-        'value': telegram_id
-      },
-      {
-        'id': '1561',
-        'value': parentRef
-      },
-      {
-        'id': '1563',
-        'value': ref
-      }
+      {'id': '1560','value': telegram_id},
+      {'id': '1561','value': parentRef},
+      {'id': '1563','value': ref}
+    }
     }
   }
 
@@ -75,6 +66,7 @@ def add(name,phone,telegram_id):
       'phone': phone,
       'fields':
       {
+      {
         'id': '1560',
         'value': telegram_id
       },
@@ -85,6 +77,7 @@ def add(name,phone,telegram_id):
       {
         'id': '1563',
         'value': ref
+      }
       }
     }
   }
@@ -100,12 +93,14 @@ def update_contact(id,wallet_id):
       'id': id,
       'fields':
       {
+      {
         'id': '1564',
         'value': wallet_id
       },
       {
         'id': '1566',
         'value': '0'
+      }
       }
     }
   }
