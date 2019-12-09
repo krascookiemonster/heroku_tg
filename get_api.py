@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
 import requests
 url = "http://amls.intrumnet.com:81/sharedapi/purchaser/filter"
 url_add = "http://amls.intrumnet.com:81/sharedapi/purchaser/insert"
@@ -12,21 +14,19 @@ def get_user_by_telegram_id(telegram_id):
       }
     }
   }
-
   response = requests.get(url,params=data)
   print(response.json())
 
 def get_ref_parent(ref_parent):
-   data = {
-    'apikey': '0635d163f4c298d4383e50e8902d0f5a',
-    'params': {
-      'fields':{
-        'id': '1563',
-        'value': ref_parent
+  data = {
+  'apikey': '0635d163f4c298d4383e50e8902d0f5a',
+  'params': {
+    'fields':{
+      'id': '1563',
+      'value': ref_parent
       }
-    }
+    } 
   }
-
   response = requests.get(url,params=data)
   print(response.json())
 
