@@ -55,7 +55,8 @@ def start_handler(message):
     else:
         referalLink = text.split(" ")[1]
     #Поиск реферальной ссылки в CRM
-        fromCrmParent = json.loads(subprocess.Popen(['php', 'CRM_API/example/customer/getRefParent.php', str(referalLink)]+ sys.argv[1:], stdout=subprocess.PIPE).communicate()[0])
+        fromCrmParent = get_api.get_ref_parent(str(referalLink))
+        #fromCrmParent = json.loads(subprocess.Popen(['php', 'CRM_API/example/customer/getRefParent.php', str(referalLink)]+ sys.argv[1:], stdout=subprocess.PIPE).communicate()[0])
         try:
             fromCrmParent['data']['list'][0]['fields']
     #Реферальная ссылка не действительна (Вообще нет похожей)
@@ -90,7 +91,8 @@ def register(message):
         bot.register_next_step_handler(msg, registerPhone)
     else:
         user_id = message.from_user.id
-        fromCrmId = json.loads(subprocess.Popen(['php', 'CRM_API/example/customer/getAll.php', str(account['telegram_id'])]+ sys.argv[1:], stdout=subprocess.PIPE).communicate()[0])
+        fromCrmId = get_api.get_user_by_telegram_id(str(account['telegram_id']))
+        #fromCrmId = json.loads(subprocess.Popen(['php', 'CRM_API/example/customer/getAll.php', str(account['telegram_id'])]+ sys.argv[1:], stdout=subprocess.PIPE).communicate()[0])
         account['telegramid'] = user_id
         try:
             fromCrmId['data']['list'][0]['id']
@@ -113,7 +115,8 @@ def registerCity(message):
     text = message.text
     if authMod.checkPhone(text):
         account['phone'] = text
-        checkPhoneDuplicate = json.loads(subprocess.Popen(['php', 'CRM_API/example/customer/getPhoneDuplicate.php', str(account['phone'])]+ sys.argv[1:], stdout=subprocess.PIPE).communicate()[0])
+        checkPhoneDuplicate = get_api.get_phone_duplicate(str(account['phone']))
+        #checkPhoneDuplicate = json.loads(subprocess.Popen(['php', 'CRM_API/example/customer/getPhoneDuplicate.php', str(account['phone'])]+ sys.argv[1:], stdout=subprocess.PIPE).communicate()[0])
         global isDuplicate
         try:    
             if checkPhoneDuplicate['data']['list'][0]['phone'][0]['phone'] == account['phone']:
@@ -147,11 +150,13 @@ def registerFinal(message):
     print "Родительская реферальная ссылка: "+account['parentRef']
     if isDuplicate:
         account['id'] = str(json.loads(checkPhoneDuplicate['data']['list'][0]['id']))
-        output_addCustomer = subprocess.Popen(['php', 'CRM_API/example/customer/update_contact_duplicate.php', str(account['id']),str(account['telegram_id']),str(account['parentRef']),str(account['ref'])]+ sys.argv[1:], stdout=subprocess.PIPE).communicate()[0]
+        checkPhoneDuplicate = get_api.update_contact_duplicate(str(account['id']),str(account['telegram_id']),str(account['parentRef']),str(account['ref']))
+        #output_addCustomer = subprocess.Popen(['php', 'CRM_API/example/customer/update_contact_duplicate.php', str(account['id']),str(account['telegram_id']),str(account['parentRef']),str(account['ref'])]+ sys.argv[1:], stdout=subprocess.PIPE).communicate()[0]
         msg = bot.send_message(message.chat.id, 'Информация обновлена. Ваша реферальная ссылка: \n<a href="https://t.me/AMLSrefbot?start='+account['ref']+'">https://t.me/AMLSrefbot?start='+account['ref']+'</a>.\nПриступить к работе в боте?',reply_markup=m.start_markup, parse_mode="Html")
         bot.register_next_step_handler(msg, start_handler)
     else:
-        output_addCustomer = subprocess.Popen(['php', 'CRM_API/example/customer/add.php', str(account['name']),str(account['phone']),str(account['telegram_id']),str(account['parentRef']),str(account['ref'])]+ sys.argv[1:], stdout=subprocess.PIPE).communicate()[0]
+        output_addCustomer = get_api.add(str(account['name']),str(account['phone']),str(account['telegram_id']))
+        #output_addCustomer = subprocess.Popen(['php', 'CRM_API/example/customer/add.php', str(account['name']),str(account['phone']),str(account['telegram_id']),str(account['parentRef']),str(account['ref'])]+ sys.argv[1:], stdout=subprocess.PIPE).communicate()[0]
         account['id'] = str(json.loads(output_addCustomer)['data'])[1:-1]
         msg = bot.send_message(message.chat.id, 'Регистрация прошла успешно. Ваша реферальная ссылка: \n<a href="https://t.me/AMLSrefbot?start='+account['ref']+'">https://t.me/AMLSrefbot?start='+account['ref']+'</a>.\nПриступить к работе в боте?',reply_markup=m.start_markup, parse_mode="Html")
         bot.register_next_step_handler(msg, register)
@@ -234,7 +239,8 @@ def printWalletId_Error(message):
         bot.register_next_step_handler(msg, printWalletId)
 def checkWalletId(message):
     print "Добавление кошелька пользователю с CRMID: "+str(account['id'])+" с номером: "+str(account['wallet_id'])
-    output_addCustomer = subprocess.Popen(['php', 'CRM_API/example/customer/update_contact.php', str(account['id']),str(account['wallet_id'])]+ sys.argv[1:], stdout=subprocess.PIPE).communicate()[0]
+    output_addCustomer = get_api.update_contact(str(account['id']),str(account['wallet_id']))
+    #output_addCustomer = subprocess.Popen(['php', 'CRM_API/example/customer/update_contact.php', str(account['id']),str(account['wallet_id'])]+ sys.argv[1:], stdout=subprocess.PIPE).communicate()[0]
     msg = bot.send_message(message.chat.id, 'Кошелек №'+account['wallet_id']+' добавлен',reply_markup=m.walletMenu_markup, parse_mode='Html')
     bot.register_next_step_handler(msg, inWallet)
 def inWallet(message):
