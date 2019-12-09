@@ -8,6 +8,7 @@ import sys
 import subprocess
 import json
 import authMod
+import get_api
 reload(sys)
 sys.setdefaultencoding('utf-8')
 #main variables
@@ -18,7 +19,8 @@ fromCrmId = {}
 #
 
 def checkWallet():
-    fromCrmId = json.loads(subprocess.Popen(['php', 'CRM_API/example/customer/getAll.php', str(account['telegram_id'])]+ sys.argv[1:], stdout=subprocess.PIPE).communicate()[0])
+    fromCrmId = get_api.get_user_by_telegram_id(str(account['telegram_id']))
+    #fromCrmId = json.loads(subprocess.Popen(['php', 'CRM_API/example/customer/getAll.php', str(account['telegram_id'])]+ sys.argv[1:], stdout=subprocess.PIPE).communicate()[0])
     for value in fromCrmId['data']['list'][0]['fields']:
         if value['id']=='1564':
             account['wallet_id'] = value['value']
@@ -35,7 +37,8 @@ def start_handler(message):
     text = message.text
     user_id = message.from_user.id
     account['telegram_id'] = user_id
-    fromCrmId = json.loads(subprocess.Popen(['php', 'CRM_API/example/customer/getAll.php', str(account['telegram_id'])]+ sys.argv[1:], stdout=subprocess.PIPE).communicate()[0])
+    fromCrmId = get_api.get_user_by_telegram_id(str(account['telegram_id']))
+    #fromCrmId = json.loads(subprocess.Popen(['php', 'CRM_API/example/customer/getAll.php', str(account['telegram_id'])]+ sys.argv[1:], stdout=subprocess.PIPE).communicate()[0])
     print "--------------------------------------"
     print "Произошла авторизация пользователя с TelegramId: "+str(message.from_user.id)
     #Проверка наличия реферальной ссылки
