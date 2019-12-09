@@ -11,6 +11,7 @@ import authMod
 reload(sys)
 sys.setdefaultencoding('utf-8')
 #main variables
+TOKEN = "870626699:AAFdb_Ai72b_9FtrWJMSrZlU4dLIWYV63Ek"
 bot = telebot.TeleBot(TOKEN)
 account = {'name':'','phone':'', 'city':'','id':'','telegram_id':'', 'registered':'', 'parentRef':'','ref':'', 'wallet_id':'', 'wallet_amount': ''}
 fromCrmId = {}
